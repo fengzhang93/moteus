@@ -93,6 +93,7 @@ struct UartEncoder {
       kTunnel,
       kDebug,
       kCuiAmt21,
+      kCe300,
 
       kNumModes,
     };
@@ -575,6 +576,7 @@ struct IsEnum<moteus::aux::UartEncoder::Config::Mode> {
         { M::kTunnel, "tunnel" },
         { M::kDebug, "debug" },
         { M::kCuiAmt21, "cui_amt21" },
+        { M::kCe300, "ce300" },
       }};
   }
 };

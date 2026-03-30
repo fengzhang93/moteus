@@ -18,3 +18,11 @@ site/
 .venv-docs/
 
 .claude/
+distdir/arm-gnu-toolchain-15.2.rel1-x86_64-arm-none-eabi.tar.xz
+distdir/mbed-os-5.13.4.tar.gz
+external/arm-gnu-toolchain-15.2.rel1-x86_64-arm-none-eabi.tar.xz
+external/arm-gnu-toolchain-15.2.rel1-x86_64-arm-none-eabi.tar.xz:Zone.Identifier
+external/clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz
+external/clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz:Zone.Identifier
+external/mbed-os-mbed-os-5.13.4.tar.gz
+external/mbed-os-mbed-os-5.13.4.tar.gz:Zone.Identifier

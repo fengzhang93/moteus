@@ -93,7 +93,8 @@ def download_bazel(dest):
 
 
 def main():
-    bazel_bin_loc = os.path.join(BAZEL_BIN_CACHE, BAZEL_VERSION)
+    # bazel_bin_loc = os.path.join(BAZEL_BIN_CACHE, BAZEL_VERSION)
+    bazel_bin_loc = os.path.join(BAZEL_BIN_CACHE, BAZEL_VERSION, f"bazel-{BAZEL_VERSION}-linux-x86_64")
 
     if not os.path.exists(bazel_bin_loc):
         os.makedirs(os.path.dirname(bazel_bin_loc), exist_ok=True)

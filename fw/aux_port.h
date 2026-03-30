@@ -33,6 +33,7 @@
 #include "fw/aux_mbed.h"
 #include "fw/bissc.h"
 #include "fw/ccm.h"
+#include "fw/ce300.h"
 #include "fw/cui_amt21.h"
 #include "fw/cui_amt22.h"
 #include "fw/ic_pz.h"
@@ -227,6 +228,10 @@ class AuxPort {
         }
         case SampleType::kAksim2: {
           aksim2_->ISR_Update(&status_.uart);
+          break;
+        }
+        case SampleType::kCe300: {
+          ce300_->ISR_Update(&status_.uart);
           break;
         }
         case SampleType::kCuiAmt21: {
@@ -447,6 +452,7 @@ class AuxPort {
     kCuiAmt22 = 11,
     kPwmInput = 12,
     kBissC = 13,
+    kCe300 = 14,
 
     kLastEntry,
   };
@@ -1220,6 +1226,10 @@ class AuxPort {
           aksim2_.emplace(config_.uart, &*uart_, timer_);
           break;
         }
+        case C::kCe300: {
+          ce300_.emplace(config_.uart, &*uart_, timer_);
+          break;
+        }
         case C::kTunnel: {
           uart_->start_dma_read(current_tunnel_write_buf_);
           tunnel_polling_enabled_ = true;
@@ -1352,6 +1362,7 @@ class AuxPort {
     if (quad_) { AddSampleType(SampleType::kQuad, false, true); }
     if (index_) { AddSampleType(SampleType::kIndex, false, true); }
     if (aksim2_) { AddSampleType(SampleType::kAksim2, false, true); }
+    if (ce300_) { AddSampleType(SampleType::kCe300, false, true); }
     if (cui_amt21_) { AddSampleType(SampleType::kCuiAmt21, false, true); }
     if (i2c_) { AddSampleType(SampleType::kI2c, false, true); }
     if (pwm_input_) { AddSampleType(SampleType::kPwmInput, false, true); }
@@ -1436,6 +1447,7 @@ class AuxPort {
   std::optional<BissC> bissc_;
   std::optional<Stm32G4DmaUart> uart_;
   std::optional<Aksim2> aksim2_;
+  std::optional<Ce300> ce300_;
   std::optional<CuiAmt21> cui_amt21_;
   std::optional<DigitalOut> rs422_re_;
   std::optional<DigitalOut> rs422_de_;

@@ -499,6 +499,8 @@ class MotorPosition {
             source_config.cpr = 4194304;
           } else if (mode == M::kCuiAmt21) {
             source_config.cpr = 16384;
+          } else if (mode == M::kCe300) {
+            source_config.cpr = 65536;
           }
           const float source_rate_hz =
               1000000.0f /

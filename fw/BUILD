@@ -100,6 +100,7 @@ MOTEUS_SOURCES = [
     "ce300.h",
     "cui_amt21.h",
     "cui_amt22.h",
+    "ktm5900.h",
     "mbed_util.h",
     "moteus_assert.cc",
     "bldc_servo.h",

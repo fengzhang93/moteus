@@ -34,9 +34,10 @@
 #include "fw/bissc.h"
 #include "fw/ccm.h"
 #include "fw/ce300.h"
+#include "fw/ic_pz.h"
 #include "fw/cui_amt21.h"
 #include "fw/cui_amt22.h"
-#include "fw/ic_pz.h"
+#include "fw/ktm5900.h"
 #include "fw/math.h"
 #include "fw/ma732.h"
 #include "fw/mbed_util.h"
@@ -128,6 +129,10 @@ class AuxPort {
           ic_pz_->ISR_StartSample();
           break;
         }
+        case SampleType::kKtm5900: {
+          ktm5900_->ISR_StartSample();
+          break;
+        }
         case SampleType::kNone: {
           return;
         }
@@ -167,6 +172,10 @@ class AuxPort {
                 (status.warn ? 1 : 0) |
                 (status.err ? 2 : 0);
           }
+          break;
+        }
+        case SampleType::kKtm5900: {
+          ktm5900_->ISR_MaybeFinishSample(&status_.spi);
           break;
         }
         case SampleType::kBissC: {
@@ -357,6 +366,16 @@ class AuxPort {
       }
     }
 
+    if (!ktm5900_ && ktm5900_options_) {
+      if (timer_->ms_since_boot() > 200) {
+        __disable_irq();
+        ktm5900_.emplace(*ktm5900_options_);
+        AddSampleType(SampleType::kKtm5900, true, true);
+
+        __enable_irq();
+      }
+    }
+
     if (!ma732_ && ma732_options_) {
       // The worst case startup time for the MA732 is 260ms, however
       // we can't current measure that long from startup.  So we'll
@@ -453,6 +472,7 @@ class AuxPort {
     kPwmInput = 12,
     kBissC = 13,
     kCe300 = 14,
+    kKtm5900 = 15,
 
     kLastEntry,
   };
@@ -832,6 +852,8 @@ class AuxPort {
     onboard_cs_.reset();
     cui_amt22_.reset();
     cui_amt22_options_.reset();
+    ktm5900_.reset();
+    ktm5900_options_.reset();
 
     bool updated_any_isr = false;
 
@@ -1046,6 +1068,19 @@ class AuxPort {
           options.timeout = 2000;
           cui_amt22_options_ = options;
 
+          break;
+        }
+        case aux::Spi::Config::kKtm5900: {
+          Ktm5900::Options options = spi_options;
+          // VESC drives this part using bit-banged SPI with explicit delays
+          // around CS and every clock edge. Be conservative until proven
+          // otherwise on hardware.
+          if (options.frequency > 400000) { options.frequency = 400000; }
+          if (options.frequency < 100000) { options.frequency = 100000; }
+          options.rx_dma = dma_channels_[0];
+          options.tx_dma = dma_channels_[1];
+          options.timeout = 2000;
+          ktm5900_options_ = options;
           break;
         }
         case aux::Spi::Config::kIcPz: {
@@ -1425,6 +1460,9 @@ class AuxPort {
 
   std::optional<CuiAmt22> cui_amt22_;
   std::optional<CuiAmt22::Options> cui_amt22_options_;
+
+  std::optional<Ktm5900> ktm5900_;
+  std::optional<Ktm5900::Options> ktm5900_options_;
 
   std::optional<IcPz> ic_pz_;
   std::optional<DigitalOut> onboard_cs_;
